@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>testing</title>
+    <script src="imagetracer_v1.2.6_trozler.js"></script>
+    <!-- <script src="simplify.js"></script> -->
+  </head>
+
+  <body>
+    <canvas id="canvas" width="400" height="400" />;
+    <script>
+      /**
+       * @param {String} HTML representing any number of sibling elements
+       * @return {NodeList}
+       */
+      function htmlToElements(html) {
+        var template = document.createElement("template");
+        template.innerHTML = html;
+        return template.content.childNodes[0].firstChild;
+      }
+
+      // This will load an image, trace it when loaded, and execute callback on the tracedata
+      ImageTracer.imageToTracedata(
+        "./testimages/14.png",
+        function (tracedata) {
+          var svgstr = ImageTracer.getsvgstring(tracedata, "grayscale");
+
+          var htmlsvg = htmlToElements(svgstr);
+
+          var canvas = document.getElementById("canvas");
+          var canvasWidth = canvas.width;
+          var canvasHeight = canvas.height;
+          var ctx = canvas.getContext("2d");
+
+          var arr = [];
+          var path = htmlsvg;
+          for (var i = 0, n_points = 4000; i < n_points; i++) {
+            var point = path.getPointAtLength(
+              (i / n_points) * path.getTotalLength()
+            );
+            arr.push(point);
+            ctx.fillRect(point.x, point.y, 2, 2);
+          }
+          return arr;
+        },
+        "grayscale"
+      );
+    </script>
+  </body>
+</html>

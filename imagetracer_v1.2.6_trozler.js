@@ -980,19 +980,29 @@ function ImageTracer(){
 		
 		// SVG start
 		var svgstr = '<svg ' + (options.viewbox ? ('viewBox="0 0 '+w+' '+h+'" ') : ('width="'+w+'" height="'+h+'" ')) +
-			'version="1.1" xmlns="http://www.w3.org/2000/svg" desc="Created with imagetracer.js version '+_this.versionnumber+'" >';
+			'version="1.1" xmlns="http://www.w3.org/2000/svg" desc="Created with a custom version of imagetracer.js' + _this.versionnumber +' for trozler" >';
 
 		// Drawing: Layers and Paths loops
+
+		let first_path = true;
 		for(var lcnt=0; lcnt < tracedata.layers.length; lcnt++){
 			for(var pcnt=0; pcnt < tracedata.layers[lcnt].length; pcnt++){
 				
 				// Adding SVG <path> string
+				//Edited by trozler 14th July 2020. Now returns a single path string, for other use. 
 				if( !tracedata.layers[lcnt][pcnt].isholepath ){
-					svgstr += _this.svgpathstring( tracedata, lcnt, pcnt, options );
+					if (first_path){
+						let pathstring = _this.svgpathstring(tracedata, lcnt, pcnt, options);
+						svgstr += '<path d="' + pathstring.split('d="')[1].replace("/>", "").replace('"', '')
+						first_path = false;
+					} else{
+						let pathstring = _this.svgpathstring(tracedata, lcnt, pcnt, options);
+						svgstr += pathstring.split('d="')[1].replace("/>", "").replace('"', '')
+					}
 				}
-					
 			}// End of paths loop
-		}// End of layers loop
+		}
+		svgstr += '"' + " stroke='rgb(0,0,0)' fill='transparent' />";
 		
 		// SVG End
 		svgstr+='</svg>';
